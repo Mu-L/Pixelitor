@@ -276,7 +276,7 @@ public class Geometry {
     public static double atan2ToIntuitive(double angleRadians) {
         return angleRadians <= 0
             ? -angleRadians
-            : Math.PI * 2 - angleRadians;
+            : Math.TAU - angleRadians;
     }
 
     /**
@@ -284,7 +284,7 @@ public class Geometry {
      */
     public static double intuitiveToAtan2(double angleRadians) {
         return angleRadians > Math.PI
-            ? 2 * Math.PI - angleRadians
+            ? Math.TAU - angleRadians
             : -angleRadians;
     }
 

@@ -92,7 +92,7 @@ public class PoissonDiskSampling {
             boolean goodPointFound = false;
             for (int i = 0; i < k; i++) {
                 Vector2D candidate;
-                double angle = 2 * Math.PI * rnd.nextDouble();
+                double angle = Math.TAU * rnd.nextDouble();
                 if (improved) {
                     double dist = minDist + 0.0000001;
                     candidate = Vector2D.createFromPolar(angle, dist);

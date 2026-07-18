@@ -91,48 +91,48 @@ public class PolarFilter extends TransformFilter {
         float r = 0;
         if (x >= cx) {
             if (y > cy) {
-                theta = ImageMath.PI - (float) FastMath.atan((x - cx) / (y - cy));
+                theta = ImageMath.PI_F - (float) FastMath.atan((x - cx) / (y - cy));
                 r = fastHypot(x - cx, y - cy);
             } else if (y < cy) {
                 theta = (float) FastMath.atan((x - cx) / (cy - y));
                 r = fastHypot(x - cx, y - cy);
             } else {
-                theta = ImageMath.HALF_PI;
+                theta = (float) (Math.PI / 2.0);
                 r = x - cx;
             }
         } else if (x < cx) {
             if (y < cy) {
-                theta = ImageMath.TWO_PI - (float) FastMath.atan((cx - x) / (cy - y));
+                theta = ImageMath.TAU_F - (float) FastMath.atan((cx - x) / (cy - y));
                 r = fastHypot(x - cx, y - cy);
             } else if (y > cy) {
-                theta = ImageMath.PI + (float) FastMath.atan((cx - x) / (y - cy));
+                theta = ImageMath.PI_F + (float) FastMath.atan((cx - x) / (y - cy));
                 r = fastHypot(x - cx, y - cy);
             } else {
-                theta = 1.5f * ImageMath.PI;
+                theta = 1.5f * ImageMath.PI_F;
                 r = cx - x;
             }
         }
         theta += angle;
         r /= zoom;
 
-        out[0] = (width - 1) - (((width - 1) / ImageMath.TWO_PI) * theta);
+        out[0] = (width - 1) - (((width - 1) / ImageMath.TAU_F) * theta);
         out[1] = height * r / radius;
     }
 
     private void polarToRect(int x, int y, float[] out) {
         float theta;
         float r;
-        theta = (float) x / width * ImageMath.TWO_PI;
+        theta = (float) x / width * ImageMath.TAU_F;
         theta += angle;
 
         float refAngle;
 
-        if (theta >= 1.5f * ImageMath.PI) {
-            refAngle = ImageMath.TWO_PI - theta;
-        } else if (theta >= ImageMath.PI) {
-            refAngle = theta - ImageMath.PI;
-        } else if (theta >= 0.5f * ImageMath.PI) {
-            refAngle = ImageMath.PI - theta;
+        if (theta >= 1.5f * ImageMath.PI_F) {
+            refAngle = ImageMath.TAU_F - theta;
+        } else if (theta >= ImageMath.PI_F) {
+            refAngle = theta - ImageMath.PI_F;
+        } else if (theta >= 0.5f * ImageMath.PI_F) {
+            refAngle = ImageMath.PI_F - theta;
         } else {
             refAngle = theta;
         }
@@ -142,7 +142,7 @@ public class PolarFilter extends TransformFilter {
         float dx = -r * (float) FastMath.sin(refAngle);
         float dy = r * (float) FastMath.cos(refAngle);
 
-        if (theta >= 1.5f * ImageMath.PI) {
+        if (theta >= 1.5f * ImageMath.PI_F) {
             out[0] = cx - dx;
             out[1] = cy - dy;
         } else if (theta >= Math.PI) {
@@ -171,7 +171,7 @@ public class PolarFilter extends TransformFilter {
         out[0] = cx + relX;
         out[1] = cy + relY;
 
-        out[0] -= (width - 1) / ImageMath.TWO_PI * angle;
+        out[0] -= (width - 1) / ImageMath.TAU_F * angle;
     }
 
     private static float fastHypot(float dx, float dy) {

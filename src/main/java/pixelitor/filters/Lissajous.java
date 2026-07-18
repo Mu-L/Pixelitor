@@ -62,7 +62,7 @@ public class Lissajous extends CurveFilter {
 
         double w = width / 2.0;
         double h = height / 2.0;
-        double dt = 2 * Math.PI / NUM_STEPS;
+        double dt = Math.TAU / NUM_STEPS;
 
         double distThreshold = Math.sqrt(width * width + height * height) / 50;
         double angleThreshold = calcAngleThreshold(aVal, bVal);

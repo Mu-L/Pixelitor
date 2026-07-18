@@ -55,9 +55,9 @@ public class JHCrystallize extends ParametrizedFilter {
 
         initParams(
             size.withAdjustedRange(0.2),
-            edgeThickness,
             gridType,
             randomness,
+            edgeThickness,
             edgeColor,
             fadeEdges
         ).withAction(paramSet.createReseedCachedAndNoiseAction());

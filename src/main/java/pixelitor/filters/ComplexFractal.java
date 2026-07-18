@@ -51,6 +51,9 @@ public abstract class ComplexFractal extends ParametrizedFilter {
     private static final int ITERATION_MULTIBROT_4 = 4;
     private static final int ITERATION_MULTIBROT_5 = 5;
 
+    // points belonging to the set are colored black
+    public static final int IN_SET_COLOR = 0xFF_00_00_00;
+
     // color cache fields
     private static int[] cachedColors = null;
     private static int cachedColorsStyle = -1;
@@ -120,7 +123,7 @@ public abstract class ComplexFractal extends ParametrizedFilter {
                 bigDest.flush();
                 yield dest;
             }
-            default -> throw new IllegalStateException("aa = " + supersamplingParam.getValue());
+            default -> throw new IllegalStateException("supersampling = " + supersamplingParam.getValue());
         };
     }
 
@@ -146,25 +149,21 @@ public abstract class ComplexFractal extends ParametrizedFilter {
 
     /**
      * Creates a lookup table mapping iteration counts to RGB colors based on the given style.
-     * Points belonging to the set (0 iterations) are always colored black.
      */
     private static int[] generateColors(int colorsStyle, int maxIterations) {
         int[] colors = new int[maxIterations + 1];
         double normalizer = Math.log(maxIterations + 1);
-        for (int it = 0; it <= maxIterations; it++) {
+
+        colors[0] = IN_SET_COLOR; // 0 remaining iterations => point belongs to the set
+
+        for (int it = 1; it <= maxIterations; it++) {
             float bri = (float) (1 + Math.log(maxIterations - it + 1) / normalizer) / 2;
             colors[it] = switch (colorsStyle) {
-                case COLORS_CONTRASTING -> Color.HSBtoRGB(
-                    it > 0 ? maxIterations / (float) it : 0,
-                    0.9f, it > 0 ? bri : 0);
-                case COLORS_CONTINUOUS -> Color.HSBtoRGB(
-                    (float) it / maxIterations,
-                    0.9f, it > 0 ? bri : 0);
-                case COLORS_BLUES -> Color.HSBtoRGB(
-                    0.5f + (float) it / (maxIterations * 10),
-                    (float) it / maxIterations,
-                    it > 0 ? bri : 0);
-                default -> throw new IllegalStateException("value = " + colorsStyle);
+                case COLORS_CONTRASTING -> Color.HSBtoRGB(maxIterations / (float) it, 0.9f, bri);
+                case COLORS_CONTINUOUS -> Color.HSBtoRGB((float) it / maxIterations, 0.9f, bri);
+                case COLORS_BLUES ->
+                    Color.HSBtoRGB(0.5f + (float) it / (maxIterations * 10), (float) it / maxIterations, bri);
+                default -> throw new IllegalStateException("Unknown color style: " + colorsStyle);
             };
         }
         return colors;

@@ -40,6 +40,7 @@ import java.util.random.RandomGenerator;
 import static java.awt.RenderingHints.KEY_ANTIALIASING;
 import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
 import static java.lang.Math.PI;
+import static java.lang.Math.TAU;
 import static pixelitor.filters.gui.BooleanParam.BooleanParamState.NO;
 import static pixelitor.filters.gui.BooleanParam.BooleanParamState.YES;
 import static pixelitor.gui.utils.SliderSpinner.LabelPosition.BORDER;
@@ -281,8 +282,8 @@ public class ChaosGame extends ParametrizedFilter {
         } else {
             // arrange the points in a circle
             for (int i = 0; i < numVertices; i++) {
-                double x = (1.0 + Math.cos(i * 2 * PI / numVertices - PI / 2)) / 2.0;
-                double y = (1.0 + Math.sin(i * 2 * PI / numVertices - PI / 2)) / 2.0;
+                double x = (1.0 + Math.cos(i * TAU / numVertices - PI / 2)) / 2.0;
+                double y = (1.0 + Math.sin(i * TAU / numVertices - PI / 2)) / 2.0;
                 vertices.add(new Vertex(x, y));
             }
         }

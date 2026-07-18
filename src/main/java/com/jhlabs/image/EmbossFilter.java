@@ -21,6 +21,8 @@ package com.jhlabs.image;
  * Lambertian (diffuse) shading from a configurable light direction.
  */
 public class EmbossFilter extends WholeImageFilter {
+    // so that normalized vectors scale to [0, 255] without rounding
+    // up to 256, guaranteeing that the calculated shade fits in 8 bits
     private static final float PIXEL_SCALE = 255.9f;
 
     // the light vector components based on azimuth and elevation
@@ -28,8 +30,9 @@ public class EmbossFilter extends WholeImageFilter {
     private final int Ly;
     private final int Lz;
 
-    private final int Nz2;
-    private final int NzLz;
+    private final int Nz2; // normal Z squared
+    private final int NzLz; // normal Z * light Z
+
     private final boolean texture;
 
     /**
@@ -50,18 +53,19 @@ public class EmbossFilter extends WholeImageFilter {
                         boolean texture) {
         super(filterName);
 
-        assert bumpHeight > 0;
-        assert elevation >= 0 && elevation <= ImageMath.HALF_PI;
+        assert bumpHeight > 0.019 && bumpHeight < 328; // UI limits
+        assert elevation >= 0 && elevation <= Math.PI / 2.0f;
 
         // rotate by π so that azimuth 0 lights from the left, matching the UI arrow direction
-        azimuth += ImageMath.PI;
+        azimuth += ImageMath.PI_F;
 
         // larger bumpHeight => smaller normalZ => the gradient terms (normalX, normalY)
         // dominate the surface normal more strongly => a more pronounced 3D relief
         float depthScale = 3 * bumpHeight;
 
-        this.Lx = (int) (Math.cos(azimuth) * Math.cos(elevation) * PIXEL_SCALE);
-        this.Ly = (int) (Math.sin(azimuth) * Math.cos(elevation) * PIXEL_SCALE);
+        double cosElevation = Math.cos(elevation);
+        this.Lx = (int) (Math.cos(azimuth) * cosElevation * PIXEL_SCALE);
+        this.Ly = (int) (Math.sin(azimuth) * cosElevation * PIXEL_SCALE);
         this.Lz = (int) (Math.sin(elevation) * PIXEL_SCALE);
 
         int Nz = (int) (6 * 255 / depthScale);

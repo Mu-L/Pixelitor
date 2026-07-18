@@ -25,6 +25,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.Serial;
 
+import static pixelitor.filters.ComplexFractal.IN_SET_COLOR;
+
 /**
  * Renders a Mandelbrot-type set, where the constant c is varied across pixels and z starts at 0.
  */
@@ -110,7 +112,7 @@ class MandelbrotSetFilter extends ComplexFractalFilter {
 
         // check for known regions of the set for a quick exit
         if (iterator.checkShortcuts(cx, cy)) {
-            return 0xFF_00_00_00; // black, indicating the point is in the set
+            return IN_SET_COLOR; // the point is in the set
         }
         return calcIteratedColor(zx, zy, cx, cy);
     }

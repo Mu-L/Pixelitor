@@ -36,11 +36,7 @@ import java.util.*;
 
 import static java.awt.RenderingHints.KEY_ANTIALIASING;
 import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
-import static java.lang.Math.PI;
-import static java.lang.Math.abs;
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
-import static java.lang.Math.toRadians;
+import static java.lang.Math.*;
 
 public class Penrose extends ParametrizedFilter {
     public static final String NAME = "Penrose Tiling";
@@ -108,12 +104,11 @@ public class Penrose extends ParametrizedFilter {
             return type.createPath(x, y, angle, size);
         }
 
-        // normalizes an angle to the range [0, 2 * PI)
+        // normalizes an angle to the range [0, TAU)
         private static double normalizeAngle(double angle) {
-            double twoPi = 2 * PI;
-            angle = angle % twoPi;
+            angle = angle % TAU;
             if (angle < 0) {
-                angle += twoPi;
+                angle += TAU;
             }
             return angle;
         }

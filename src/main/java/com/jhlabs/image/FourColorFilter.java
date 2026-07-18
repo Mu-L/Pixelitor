@@ -245,10 +245,10 @@ public abstract class FourColorFilter extends PointFilter {
      */
     protected void setupAngularData(boolean needsDist) {
         // calculate the angle for each corner relative to the center
-        double angleNW = ImageMath.mod(FastMath.atan2(-cy, -cx), Math.PI * 2.0);
-        double angleNE = ImageMath.mod(FastMath.atan2(-cy, width - cx), Math.PI * 2.0);
-        double angleSW = ImageMath.mod(FastMath.atan2(height - cy, -cx), Math.PI * 2.0);
-        double angleSE = ImageMath.mod(FastMath.atan2(height - cy, width - cx), Math.PI * 2.0);
+        double angleNW = ImageMath.mod(FastMath.atan2(-cy, -cx), Math.TAU);
+        double angleNE = ImageMath.mod(FastMath.atan2(-cy, width - cx), Math.TAU);
+        double angleSW = ImageMath.mod(FastMath.atan2(height - cy, -cx), Math.TAU);
+        double angleSE = ImageMath.mod(FastMath.atan2(height - cy, width - cx), Math.TAU);
 
         // calculate distance from center to each corner
         double distNW = 0, distNE = 0, distSW = 0, distSE = 0;
@@ -280,7 +280,7 @@ public abstract class FourColorFilter extends PointFilter {
         double r23 = corners[3].angle - corners[2].angle;
         invRange23 = r23 <= EPSILON ? 0.0 : 1.0 / r23;
 
-        double r30 = (corners[0].angle + Math.PI * 2.0) - corners[3].angle;
+        double r30 = (corners[0].angle + Math.TAU) - corners[3].angle;
         invRange30 = r30 <= EPSILON ? 0.0 : 1.0 / r30;
     }
 

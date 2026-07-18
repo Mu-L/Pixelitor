@@ -576,8 +576,8 @@ public class TransformBox implements ToolWidget, Debuggable, Serializable {
     void rotate(QuadrantAngle rotAngle) {
         double delta = Math.toRadians(rotAngle.getAngleDegree());
         double newAngle = angle + delta;
-        if (newAngle >= Math.PI * 2) {
-            newAngle -= Math.PI * 2;
+        if (newAngle >= Math.TAU) {
+            newAngle -= Math.TAU;
         }
         rotateTo(newAngle, RADIANS);
 

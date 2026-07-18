@@ -158,6 +158,7 @@ public abstract class ComplexFractalFilter extends PointFilter {
          *         (i.e. it's considered part of the set)
          */
         int iterate(double zx, double zy, double cx, double cy, int maxIterations);
+
         /**
          * Checks for regions that are known to be part of the set, allowing for a fast exit.
          */
@@ -179,35 +180,15 @@ public abstract class ComplexFractalFilter extends PointFilter {
         public int iterate(double zx, double zy, double cx, double cy, int maxIt) {
             int it = maxIt;
 
-            // x2/y2 always hold the squared components of the CURRENT zx, zy,
-            // refreshed after every update, so the escape check never inspects a stale z
-            double x2 = zx * zx;
-            double y2 = zy * zy;
-            while (x2 + y2 <= ESCAPE_RADIUS_SQ && it > 0) {
+            double zx2 = zx * zx;
+            double zy2 = zy * zy;
+            while (zx2 + zy2 <= ESCAPE_RADIUS_SQ && it > 0) {
                 it--;
                 double xy = zx * zy;
-                zx = x2 - y2 + cx;
+                zx = zx2 - zy2 + cx;
                 zy = xy + xy + cy;
-                x2 = zx * zx;
-                y2 = zy * zy;
-            }
-            return it;
-        }
-
-        // an unoptimized version of the iterate method, kept for reference to show the algorithm more clearly
-        @SuppressWarnings("unused")
-        public int iterateReference(double x, double y, double cx, double cy, int maxIt) {
-            int it = maxIt;
-            while (x * x + y * y < ESCAPE_RADIUS_SQ && it > 0) {
-                it--;
-                double xTmp = x * x - y * y + cx;
-                double yTmp = 2.0 * x * y + cy;
-                if (x == xTmp && y == yTmp) {
-                    it = 0;
-                    break;
-                }
-                y = yTmp;
-                x = xTmp;
+                zx2 = zx * zx;
+                zy2 = zy * zy;
             }
             return it;
         }
@@ -215,18 +196,18 @@ public abstract class ComplexFractalFilter extends PointFilter {
         @Override
         public boolean checkShortcuts(double cx, double cy) {
             // check if the point is inside the main cardioid
-            if (cx > -0.75 && cx < 0.37 && cy < 0.65 && cy > -0.65) { // approximate check
-                double cm = cx - 1 / 4.0;
+            if (cx > -0.75 && cx < 0.37 && cy < 0.65 && cy > -0.65) { // bounding-box check
+                double cm = cx - 0.25;
                 double cy2 = cy * cy;
                 double q = cm * cm + cy2;
-                if (q * (q + cm) < cy2 / 4.0) { // exact check
+                if (q * (q + cm) < cy2 * 0.25) { // exact check
                     return true; // point is in the set
                 }
             }
 
             // check if the point is in the period-2 bulb
-            if (cx < -0.75 && cx > -1.25 && cy < 0.28 && cy > -0.28) { // approximate check
-                if ((cx + 1) * (cx + 1) + cy * cy < 1 / 16.0) { // exact check
+            if (cx < -0.75 && cx > -1.25 && cy < 0.28 && cy > -0.28) { // bounding-box check
+                if ((cx + 1) * (cx + 1) + cy * cy < 0.0625) { // exact check
                     return true; // point is in the set
                 }
             }
@@ -248,14 +229,20 @@ public abstract class ComplexFractalFilter extends PointFilter {
         @Override
         public int iterate(double zx, double zy, double cx, double cy, int maxIt) {
             int it = maxIt;
-            while (zx * zx + zy * zy <= ESCAPE_RADIUS_SQ && it > 0) {
+            double zx2 = zx * zx;
+            double zy2 = zy * zy;
+
+            while (zx2 + zy2 <= ESCAPE_RADIUS_SQ && it > 0) {
                 it--;
                 zx = Math.abs(zx);
                 zy = Math.abs(zy);
 
-                double xTmp = zx * zx - zy * zy + cx;
+                double xTmp = zx2 - zy2 + cx;
                 zy = 2.0 * zx * zy + cy;
                 zx = xTmp;
+
+                zx2 = zx * zx;
+                zy2 = zy * zy;
             }
             return it;
         }
@@ -273,13 +260,19 @@ public abstract class ComplexFractalFilter extends PointFilter {
         @Override
         public int iterate(double zx, double zy, double cx, double cy, int maxIt) {
             int it = maxIt;
-            while (zx * zx + zy * zy <= ESCAPE_RADIUS_SQ && it > 0) {
+            double zx2 = zx * zx;
+            double zy2 = zy * zy;
+
+            while (zx2 + zy2 <= ESCAPE_RADIUS_SQ && it > 0) {
                 it--;
                 // use the conjugate of z, which means negating the
                 // imaginary part before calculating the next step
-                double xTmp = zx * zx - zy * zy + cx;
+                double xTmp = zx2 - zy2 + cx;
                 zy = -2.0 * zx * zy + cy; // the only change is the minus sign here
                 zx = xTmp;
+
+                zx2 = zx * zx;
+                zy2 = zy * zy;
             }
             return it;
         }
@@ -308,18 +301,21 @@ public abstract class ComplexFractalFilter extends PointFilter {
         @Override
         public int iterate(double zx, double zy, double cx, double cy, int maxIt) {
             int it = maxIt;
-            while (zx * zx + zy * zy <= ESCAPE_RADIUS_SQ && it > 0) {
+            double zx2 = zx * zx;
+            double zy2 = zy * zy;
+
+            while (zx2 + zy2 <= ESCAPE_RADIUS_SQ && it > 0) {
                 it--;
                 // calculate z^3 + c
                 // z^3 = (zx + i*zy)^3 = (zx^3 - 3*zx*zy^2) + i*(3*zx^2*zy - zy^3)
-                double zx2 = zx * zx;
-                double zy2 = zy * zy;
-
                 double nextZx = zx * (zx2 - 3 * zy2) + cx;
                 double nextZy = zy * (3 * zx2 - zy2) + cy;
 
                 zx = nextZx;
                 zy = nextZy;
+
+                zx2 = zx * zx;
+                zy2 = zy * zy;
             }
             return it;
         }
@@ -348,11 +344,14 @@ public abstract class ComplexFractalFilter extends PointFilter {
         @Override
         public int iterate(double zx, double zy, double cx, double cy, int maxIt) {
             int it = maxIt;
-            while (zx * zx + zy * zy <= ESCAPE_RADIUS_SQ && it > 0) {
+            double zx2 = zx * zx;
+            double zy2 = zy * zy;
+
+            while (zx2 + zy2 <= ESCAPE_RADIUS_SQ && it > 0) {
                 it--;
                 // calculate z^4 + c by computing z^4 = (z^2)^2
                 // first, z^2
-                double z2Re = zx * zx - zy * zy;
+                double z2Re = zx2 - zy2;
                 double z2Im = 2 * zx * zy;
 
                 // then, (z^2)^2
@@ -361,6 +360,9 @@ public abstract class ComplexFractalFilter extends PointFilter {
 
                 zx = nextZx;
                 zy = nextZy;
+
+                zx2 = zx * zx;
+                zy2 = zy * zy;
             }
             return it;
         }
@@ -389,11 +391,14 @@ public abstract class ComplexFractalFilter extends PointFilter {
         @Override
         public int iterate(double zx, double zy, double cx, double cy, int maxIt) {
             int it = maxIt;
-            while (zx * zx + zy * zy <= ESCAPE_RADIUS_SQ && it > 0) {
+            double zx2 = zx * zx;
+            double zy2 = zy * zy;
+
+            while (zx2 + zy2 <= ESCAPE_RADIUS_SQ && it > 0) {
                 it--;
                 // calculate z^5 + c by computing z^5 = z^4 * z = (z^2)^2 * z
                 // first, z^2
-                double z2Re = zx * zx - zy * zy;
+                double z2Re = zx2 - zy2;
                 double z2Im = 2 * zx * zy;
 
                 // then, z^4 = (z^2)^2
@@ -406,6 +411,9 @@ public abstract class ComplexFractalFilter extends PointFilter {
 
                 zx = nextZx;
                 zy = nextZy;
+
+                zx2 = zx * zx;
+                zy2 = zy * zy;
             }
             return it;
         }

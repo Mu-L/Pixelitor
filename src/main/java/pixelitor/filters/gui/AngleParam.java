@@ -185,7 +185,7 @@ public class AngleParam extends AbstractFilterParam {
     }
 
     private static double normalize(double angle) {
-        return angle < 0 ? angle + 2 * Math.PI : angle;
+        return angle < 0 ? angle + Math.TAU : angle;
     }
 
     @Override

@@ -99,7 +99,7 @@ public class SparkleFilter extends PointFilter {
         rayLengths[numRays + 1] = rayLengths[1];
 
         falloffExponent = (MAX_AMOUNT - amount) / (double) NEUTRAL_AMOUNT;
-        rayAngleFactor = numRays / TWO_PI;
+        rayAngleFactor = (float) (numRays * ImageMath.INV_TAU);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class SparkleFilter extends PointFilter {
         }
 
         // wraps the (possibly spiral-shifted) angle into the [0, numRays) range
-        float rayPosition = mod(angle + PI, TWO_PI) * rayAngleFactor;
+        float rayPosition = mod(angle + PI_F, TAU_F) * rayAngleFactor;
 
         int rayIndex = Math.clamp((int) rayPosition, 0, numRays);
         float fraction = rayPosition - rayIndex;

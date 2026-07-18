@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static com.jhlabs.image.ImageMath.INV_TAU;
+
 /**
  * Generates a concentric Voronoi diagram with optional distortion
  * (randomness, spiral, pinch/bulge) and renders each cell using
@@ -147,7 +149,7 @@ public class RadialMosaic extends ParametrizedFilter {
             return 0;
         }
         // at ±1.0, the outermost ring completes a full 360-degree rotation
-        return spiral * Math.PI * 2.0 * ((r + 1.0) / numRings);
+        return spiral * Math.TAU * ((r + 1.0) / numRings);
     }
 
     private static SeedPoint genCenterPoint(double cx, double cy, Random random, double maxOffset) {
@@ -181,7 +183,7 @@ public class RadialMosaic extends ParametrizedFilter {
             double angleBase = ringOffset + spiralAngle;
 
             for (int i = 0; i < pointsInRing; i++) {
-                double angle = 2 * Math.PI * i / pointsInRing + angleBase;
+                double angle = Math.TAU * i / pointsInRing + angleBase;
 
                 // add random displacement bounded to local distances
                 double offsetX = (random.nextDouble() * 2 - 1) * localMaxOffset;
@@ -234,7 +236,7 @@ public class RadialMosaic extends ParametrizedFilter {
 
             for (int i = 0; i < pointsInRing; i++) {
                 SeedPoint current = rings[ringIndex][i];
-                double currentAngle = 2 * Math.PI * i / pointsInRing + currentAngleBase;
+                double currentAngle = Math.TAU * i / pointsInRing + currentAngleBase;
 
                 // left and right on the same ring
                 int leftIndex = Math.floorMod(i - 1, pointsInRing);
@@ -264,7 +266,7 @@ public class RadialMosaic extends ParametrizedFilter {
                                              double currentAngle, int targetPoints, double targetOffset) {
         // Assumes angular ordering between rings is preserved despite distortion.
         // Large distortions reduce neighbor accuracy.
-        double exactIndex = (currentAngle - targetOffset) * targetPoints / (2 * Math.PI);
+        double exactIndex = (currentAngle - targetOffset) * targetPoints * INV_TAU;
         int baseIdx = Math.floorMod(Math.round(exactIndex), targetPoints);
 
         int n1 = Math.floorMod(baseIdx - 1, targetPoints);

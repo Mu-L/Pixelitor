@@ -365,7 +365,7 @@ public class AbstractLights extends ParametrizedFilter {
             this.radiusX = radiusX;
             this.radiusY = radiusY;
             this.angle = initialAngle;
-            this.angleIncrement = 2 * Math.PI * speed / DEFAULT_NUM_ITERATIONS;
+            this.angleIncrement = Math.TAU * speed / DEFAULT_NUM_ITERATIONS;
 
             // set initial position on the ellipse
             updatePosition();

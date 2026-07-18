@@ -210,7 +210,7 @@ public class PhotoCollage extends ParametrizedFilter {
         var imageTransform = AffineTransform.getTranslateInstance(tx, ty);
 
         // step 1: rotate
-        double maxAngle = 2 * Math.PI * rand.nextFloat() - Math.PI; // in [-π, π]
+        double maxAngle = Math.TAU * rand.nextFloat() - Math.PI; // in [-π, π]
         double rotationStrength = randomRotation.getPercentage(); // in [0, 1]
         double angle = maxAngle * rotationStrength;
         imageTransform.rotate(angle, photoWidth / 2.0, photoHeight / 2.0);

@@ -738,6 +738,10 @@ public class CropTool extends DragTool {
     @Override
     public void otherKeyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (e.getSource() instanceof JFormattedTextField) {
+                // the user tries to enter exact crop dimensions
+                return;
+            }
             if (crop()) {
                 e.consume();
             }

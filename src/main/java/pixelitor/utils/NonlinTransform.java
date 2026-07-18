@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Laszlo Balazs-Csiki and Contributors
+ * Copyright 2026 Laszlo Balazs-Csiki and Contributors
  *
  * This file is part of Pixelitor. Pixelitor is free software: you
  * can redistribute it and/or modify it under the terms of the GNU
@@ -25,15 +25,9 @@ import java.awt.geom.Path2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 
-import static java.awt.geom.PathIterator.SEG_CLOSE;
-import static java.awt.geom.PathIterator.SEG_CUBICTO;
-import static java.awt.geom.PathIterator.SEG_LINETO;
-import static java.awt.geom.PathIterator.SEG_MOVETO;
-import static java.awt.geom.PathIterator.SEG_QUADTO;
-import static java.lang.Math.PI;
-import static net.jafama.FastMath.atan2;
-import static net.jafama.FastMath.cos;
-import static net.jafama.FastMath.sin;
+import static java.awt.geom.PathIterator.*;
+import static java.lang.Math.TAU;
+import static net.jafama.FastMath.*;
 
 /**
  * Nonlinear transformations that can be applied to points.
@@ -108,7 +102,7 @@ public enum NonlinTransform {
             double maxR = Math.min(width, height) / 2.0;
             return (x, y) -> {
                 double r = x * maxR / width;
-                double angle = y * 2 * PI / height;
+                double angle = y * TAU / height;
 
                 double newX = center.getX() + r * cos(angle);
                 double newY = center.getY() + r * sin(angle);

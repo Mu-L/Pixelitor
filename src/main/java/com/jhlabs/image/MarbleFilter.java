@@ -48,9 +48,9 @@ public class MarbleFilter extends TransformFilter {
         sinTable = new float[TABLE_SIZE];
         cosTable = new float[TABLE_SIZE];
 
-        float angleMultiplier = ImageMath.TWO_PI * turbulence / TABLE_SIZE;
+        double angleMultiplier = Math.TAU * turbulence / TABLE_SIZE;
         for (int i = 0; i < TABLE_SIZE; i++) {
-            float angle = i * angleMultiplier;
+            double angle = i * angleMultiplier;
 
             sinTable[i] = (float) (-amount * Math.sin(angle));
             cosTable[i] = (float) (amount * Math.cos(angle));

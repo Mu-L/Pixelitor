@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Laszlo Balazs-Csiki and Contributors
+ * Copyright 2026 Laszlo Balazs-Csiki and Contributors
  *
  * This file is part of Pixelitor. Pixelitor is free software: you
  * can redistribute it and/or modify it under the terms of the GNU
@@ -28,9 +28,8 @@ import java.awt.geom.*;
 
 import static java.awt.Color.WHITE;
 import static java.lang.Math.PI;
-import static net.jafama.FastMath.atan2;
-import static net.jafama.FastMath.cos;
-import static net.jafama.FastMath.sin;
+import static java.lang.Math.TAU;
+import static net.jafama.FastMath.*;
 
 public class CustomShapes {
     private CustomShapes() {
@@ -135,7 +134,7 @@ public class CustomShapes {
     }
 
     public static Shape createCircumscribedPolygon(int n, double cx, double cy, double radius, double tuning) {
-        double angleIncrement = PI * 2 / n;
+        double angleIncrement = TAU / n;
         double maxRadius = radius / cos(angleIncrement / 2);
         double angle = 3 * PI / 2;
         if (n % 2 == 0) {
@@ -165,7 +164,7 @@ public class CustomShapes {
     }
 
     public static Shape createFlower(int n, double cx, double cy, double radius, double width) {
-        double angleIncrement = PI * 2 / n;
+        double angleIncrement = TAU / n;
         // 0.45 instead of 0.5 so that the distant radius never goes to infinity
         double halfAngleIncrement = angleIncrement * (0.5 + width * 0.45);
         double angle = -PI / 2;
@@ -246,7 +245,7 @@ public class CustomShapes {
         // Math at https://stackoverflow.com/questions/1734745/how-to-create-circle-with-b%C3%A9zier-curves
         Path2D path = new Path2D.Double();
         double angle = 0;
-        double angleIncrement = 2 * PI / numPoints;
+        double angleIncrement = TAU / numPoints;
         double handleLength = 4 * radius * FastMath.tan(PI / (2 * numPoints)) / 3;
         Point2D[] points = new Point2D[numPoints];
         Point2D[] forwardControls = new Point2D[numPoints];

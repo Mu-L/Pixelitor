@@ -67,10 +67,10 @@ public class LittlePlanetFilter extends CenteredTransformFilter {
         double maxRadius = height * zoom / 2;
         double angle = Geometry.atan2ToIntuitive(FastMath.atan2(dy, dx)) + rotationAngle;
 
-        if (angle > 2 * Math.PI) {
-            angle -= 2 * Math.PI;
+        if (angle > Math.TAU) {
+            angle -= Math.TAU;
         }
-        float srcX = (float) (angle * width / (2 * Math.PI));
+        float srcX = (float) (angle * width * ImageMath.INV_TAU);
         float radiusRatio = (float) (r / maxRadius);
         float biasedRadiusRatio = ImageMath.bias(radiusRatio, innerZoom);
         float srcY = biasedRadiusRatio * height;

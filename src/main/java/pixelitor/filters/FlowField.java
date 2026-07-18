@@ -435,7 +435,7 @@ public class FlowField extends ParametrizedFilter {
         Rectangle bounds = new Rectangle(-PAD, -PAD,
             fieldWidth + PAD * 2, fieldHeight + PAD * 2);
         float variance = (float) Math.PI * (varianceParam.getValue() / 10.0f);
-        float startAngle = (float) (r.nextFloat() * 2 * Math.PI);
+        float startAngle = (float) (r.nextFloat() * Math.TAU);
 
         int groupCount = IS_MULTI_THREADED ? (int) Math.ceil(particleCount / (double) PARTICLES_PER_GROUP) : 1;
         var pt = new StatusBarProgressTracker(NAME, groupCount);

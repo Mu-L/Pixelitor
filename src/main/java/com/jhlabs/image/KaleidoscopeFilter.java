@@ -21,6 +21,8 @@ import net.jafama.FastMath;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
+import static com.jhlabs.image.ImageMath.INV_TAU;
+
 /**
  * A Filter which produces the effect of looking into a kaleidoscope.
  */
@@ -80,12 +82,12 @@ public class KaleidoscopeFilter extends TransformFilter {
         double theta = FastMath.atan2(dy, dx) - angle - angle2;
 
         // create kaleidoscope effect by repeating angular segments
-        theta = ImageMath.triangle((float) (theta / Math.PI * sides * 0.5));
+        theta = ImageMath.triangle((float) (theta * INV_TAU * sides));
 
         theta += angle; // apply final rotation
         double zoomedR = r / zoom; // apply final zooming
 
-        // convert back to cartesian coordinates
+        // convert back to Cartesian coordinates
         out[0] = (float) (cx + zoomedR * FastMath.cos(theta));
         out[1] = (float) (cy + zoomedR * FastMath.sin(theta));
     }

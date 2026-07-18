@@ -146,8 +146,8 @@ public class Noise {
      * @param x the x value
      * @return the noise value at x
      */
-    public static float sinLikeNoise1(float x) {
-        return 2.0f * noise1(x / PI);
+    public static float sinLikeNoise1(double x) {
+        return 2.0f * noise1((float) (x * INV_PI));
     }
 
     /**

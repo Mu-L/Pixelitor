@@ -31,14 +31,20 @@ public class PolarTilesFilter extends CenteredTransformFilter {
     public static final int MODE_SPIRAL = 1;
     public static final int MODE_VORTEX = 2;
 
-    private final int mode;
-    private final int numADivisions;
-    private final int numRDivisions;
-    private final float curvature;
     private final double effectRotation;
     private final float randomness;
-    private final double zoom;
     private final double imageRotation;
+
+    // precomputed factors for inner-loop performance
+    private final double invZoom;
+    private final double halfAngularDivisions;
+    private final double angularCurvatureFactor;
+    private final double radialCurvatureFactor;
+    private final double radialAngleDivisions;
+    private final double baseSpiralAngle;
+    private final double spiralAngleFactor;
+    private final boolean hasAngularDistortion;
+    private final boolean hasRadialDistortion;
 
     /**
      * Constructs a new PolarTilesFilter.
@@ -48,8 +54,8 @@ public class PolarTilesFilter extends CenteredTransformFilter {
      * @param interpolation  the interpolation method (NEAREST_NEIGHBOR, BILINEAR, BICUBIC).
      * @param center         the effect's center (in pixels).
      * @param mode           the tile mode (CONCENTRIC, SPIRAL, or VORTEX).
-     * @param numADivisions  the number of angular divisions.
-     * @param numRDivisions  the number of radial divisions.
+     * @param angularDivisions  the number of angular divisions.
+     * @param radialDivisions  the number of radial divisions.
      * @param curvature      the curvature factor of the glass tiles.
      * @param effectRotation the rotation applied to the tile effect (0.0 to 1.0).
      * @param randomness     the amount of random noise displacement (0.0 to 1.0).
@@ -57,24 +63,53 @@ public class PolarTilesFilter extends CenteredTransformFilter {
      * @param imageRotation  the rotation of the underlying image in radians.
      */
     public PolarTilesFilter(String filterName, int edgeAction, int interpolation, Point2D center,
-                            int mode, int numADivisions, int numRDivisions, double curvature,
+                            int mode, int angularDivisions, int radialDivisions, double curvature,
                             double effectRotation, double randomness, double zoom, double imageRotation) {
         super(filterName, edgeAction, interpolation, center);
 
-        this.mode = mode;
-        this.numADivisions = numADivisions;
-        this.numRDivisions = numRDivisions;
-        this.curvature = (float) (curvature * curvature / 10.0f);
+        assert zoom > 0.0;
+        assert angularDivisions >= 0 && radialDivisions >= 0;
+
+        // tan(x) has a period of π => the [0.0, 1.0] parameter
+        // span covers a complete repeating cycle of the effect
         this.effectRotation = Math.PI * effectRotation;
+
         this.randomness = (float) (randomness * Math.PI);
-        this.zoom = zoom;
         this.imageRotation = imageRotation;
+
+        this.invZoom = 1.0 / zoom;
+        double scaledCurvature = (curvature * curvature) * 0.1;
+        this.angularCurvatureFactor = scaledCurvature * ((double) angularDivisions / 4);
+        this.radialCurvatureFactor = scaledCurvature * ((double) radialDivisions / 2);
+        this.halfAngularDivisions = angularDivisions * 0.5;
+        this.radialAngleDivisions = Math.TAU * radialDivisions;
+        this.baseSpiralAngle = Math.PI + this.effectRotation;
+        this.hasAngularDistortion = angularDivisions > 0 && angularCurvatureFactor != 0.0;
+        this.hasRadialDistortion = radialDivisions > 0 && radialCurvatureFactor != 0.0;
+
+        this.spiralAngleFactor = switch (mode) {
+            case MODE_SPIRAL -> (radialDivisions > 0) ? 0.5 : 0.0;
+            case MODE_VORTEX -> 0.5 * radialDivisions;
+            case MODE_CONCENTRIC -> 0.0;
+            default -> throw new IllegalArgumentException("Unknown mode: " + mode);
+        };
     }
 
     @Override
     protected void transformInverse(int x, int y, float[] out) {
         double dx = x - cx;
         double dy = y - cy;
+        double r2 = dx * dx + dy * dy;
+
+        if (r2 == 0.0) {
+            // (cx, cy) is the invariant center of scaling and rotation;
+            // returning early also avoids division by zero
+            out[0] = (float) cx;
+            out[1] = (float) cy;
+            return;
+        }
+
+        double radius = Math.sqrt(r2);
         double angle = FastMath.atan2(dy, dx);
 
         float noiseOffset = 0;
@@ -82,33 +117,28 @@ public class PolarTilesFilter extends CenteredTransformFilter {
             noiseOffset = randomness * Noise.noise2((float) (dx / width), (float) (dy / height));
         }
 
-        double radius = Math.sqrt(dx * dx + dy * dy);
-        double adjustedRadius = radius;
-        if (mode != MODE_CONCENTRIC) {
-            double spiralCorr = width * (Math.PI + angle + effectRotation) / (4 * Math.PI);
-            if (mode == MODE_SPIRAL) {
-                spiralCorr /= numRDivisions;
+        double distortedAngle = angle;
+        if (hasAngularDistortion) {
+            double angularTan = FastMath.tan(noiseOffset + effectRotation + angle * halfAngularDivisions);
+            double angularShift = (angularTan * angularCurvatureFactor) / radius;
+            distortedAngle += angularShift;
+        }
+
+        if (hasRadialDistortion) {
+            double radialArg = (radius / width) * radialAngleDivisions;
+            if (spiralAngleFactor != 0.0) {
+                radialArg += (baseSpiralAngle + angle) * spiralAngleFactor;
             }
-            adjustedRadius += spiralCorr;
+            double radialTan = FastMath.tan(3 * noiseOffset + radialArg);
+            double radialShift = radialTan * radialCurvatureFactor;
+            radius += radialShift;
         }
 
-        if (numADivisions > 0) {
-            double tan = FastMath.tan(noiseOffset + effectRotation + angle * numADivisions / 2);
-            double angleShift = tan * curvature * (numADivisions / 4.0) / radius;
-            angle += angleShift;
-        }
+        distortedAngle += imageRotation;
 
-        if (numRDivisions > 0) {
-            double tan = FastMath.tan(3 * noiseOffset + adjustedRadius / width * 2 * Math.PI * numRDivisions);
-            double rShift = tan * numRDivisions * curvature / 2;
-            radius += rShift;
-        }
-
-        angle += imageRotation;
-
-        double zoomedR = radius / zoom;
-        double u = zoomedR * FastMath.cos(angle);
-        double v = zoomedR * FastMath.sin(angle);
+        double zoomedR = radius * invZoom;
+        double u = zoomedR * FastMath.cos(distortedAngle);
+        double v = zoomedR * FastMath.sin(distortedAngle);
 
         out[0] = (float) (u + cx);
         out[1] = (float) (v + cy);

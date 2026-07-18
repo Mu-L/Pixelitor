@@ -264,7 +264,7 @@ public class ConcentricShapes extends ParametrizedFilter {
 
             double startAngle = 3 * Math.PI / 2;
             for (int i = 0; i < numShapes; i++) {
-                double angle = startAngle + 2 * Math.PI * i / numShapes;
+                double angle = startAngle + Math.TAU * i / numShapes;
                 double x = cx + ringRadius * Math.cos(angle);
                 double y = cy + ringRadius * Math.sin(angle);
                 color = selectColor(colors, shapeCount);
