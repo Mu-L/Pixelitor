@@ -20,6 +20,7 @@ package pixelitor.filters;
 import pixelitor.filters.gui.AngleParam;
 import pixelitor.filters.gui.GroupedRangeParam;
 import pixelitor.filters.gui.IntChoiceParam;
+import pixelitor.filters.gui.IntChoiceParam.Item;
 import pixelitor.filters.impl.TilesFilter;
 
 import java.awt.image.BufferedImage;
@@ -34,6 +35,15 @@ public class GlassTiles extends ParametrizedFilter {
     @Serial
     private static final long serialVersionUID = 1062493790771795674L;
 
+    private final IntChoiceParam mode = new IntChoiceParam("Type", new Item[]{
+        new Item("Squares", TilesFilter.MODE_SQUARES),
+        new Item("Brick", TilesFilter.MODE_BRICK),
+        new Item("Triangles", TilesFilter.MODE_TRIANGLES),
+        new Item("Hexagons", TilesFilter.MODE_HEXAGONS),
+        new Item("Octagons and Squares", TilesFilter.MODE_OCTAGONS_AND_SQUARES),
+        new Item("Fish Scales", TilesFilter.MODE_FISH_SCALES),
+    });
+
     private final GroupedRangeParam size = new GroupedRangeParam("Tile Size", 5, 100, 500);
     private final GroupedRangeParam curvature = new GroupedRangeParam("Curvature", 0, 10, 20);
     private final GroupedRangeParam phase = new GroupedRangeParam("Move Tiles", 0, 0, 10, false);
@@ -45,6 +55,7 @@ public class GlassTiles extends ParametrizedFilter {
         super(true);
 
         initParams(
+            mode,
             size.withAdjustedRange(0.5),
             curvature,
             phase.notLinkable(),
@@ -60,6 +71,7 @@ public class GlassTiles extends ParametrizedFilter {
             edgeAction.getValue(),
             interpolation.getValue(),
             angle.getValueInIntuitiveRadians(),
+            mode.getValue(),
             size.getValueAsDouble(0),
             phase.getPercentage(0),
             size.getValueAsDouble(1),
