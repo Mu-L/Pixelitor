@@ -44,7 +44,8 @@ public class SmearFilter extends WholeImageFilter {
     private final int distance;
     private final Random random;
     private final int shape;
-    private final float mix;
+    private final int mixInt;
+    private final int invMixInt;
 
     /**
      * Constructs a new {@link SmearFilter}.
@@ -74,7 +75,8 @@ public class SmearFilter extends WholeImageFilter {
         this.distance = distance;
         this.density = density;
         this.angle = angle;
-        this.mix = mix;
+        this.mixInt = (int) (mix * 256);
+        this.invMixInt = 256 - mixInt;
         this.random = random;
     }
 
@@ -82,7 +84,7 @@ public class SmearFilter extends WholeImageFilter {
     protected int[] filterPixels(int width, int height, int[] inPixels) {
         int[] outPixels = new int[width * height];
         System.arraycopy(inPixels, 0, outPixels, 0, width * height);
-        if (distance == 0) {
+        if (distance == 0 || density == 0.0f || mixInt == 0) {
             return outPixels;
         }
 
@@ -135,9 +137,6 @@ public class SmearFilter extends WholeImageFilter {
         int r2 = (rgb >> 16) & 0xFF;
         int g2 = (rgb >> 8) & 0xFF;
         int b2 = rgb & 0xFF;
-
-        int mixInt = (int) (mix * 256);
-        int invMixInt = 256 - mixInt;
 
         int startX = Math.max(0, x - length);
         int endX = Math.min(width - 1, x + length);
@@ -198,9 +197,6 @@ public class SmearFilter extends WholeImageFilter {
         int r2 = (rgb >> 16) & 0xFF;
         int g2 = (rgb >> 8) & 0xFF;
         int b2 = rgb & 0xFF;
-
-        int mixInt = (int) (mix * 256);
-        int invMixInt = 256 - mixInt;
 
         int x0 = sx - offsetX;
         int y0 = sy - offsetY;
@@ -298,9 +294,6 @@ public class SmearFilter extends WholeImageFilter {
         int r2 = (rgb >> 16) & 0xFF;
         int g2 = (rgb >> 8) & 0xFF;
         int b2 = rgb & 0xFF;
-
-        int mixInt = (int) (mix * 256);
-        int invMixInt = 256 - mixInt;
 
         int minSx = Math.max(0, sx - radius);
         int maxSx = Math.min(width, sx + radius + 1);

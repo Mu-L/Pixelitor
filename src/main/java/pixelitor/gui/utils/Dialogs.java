@@ -43,15 +43,7 @@ import java.util.concurrent.CompletionException;
 import java.util.logging.Level;
 
 import static java.lang.String.format;
-import static javax.swing.JOptionPane.ERROR_MESSAGE;
-import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
-import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
-import static javax.swing.JOptionPane.OK_OPTION;
-import static javax.swing.JOptionPane.QUESTION_MESSAGE;
-import static javax.swing.JOptionPane.WARNING_MESSAGE;
-import static javax.swing.JOptionPane.YES_NO_CANCEL_OPTION;
-import static javax.swing.JOptionPane.YES_NO_OPTION;
-import static javax.swing.JOptionPane.YES_OPTION;
+import static javax.swing.JOptionPane.*;
 import static pixelitor.utils.Threads.calledOutsideEDT;
 import static pixelitor.utils.Threads.threadName;
 
@@ -279,7 +271,7 @@ public class Dialogs {
         Frame parent = getMainWindow();
         String errorReportMessage = """
             A program error occurred.
-                        
+            
             Please consider reporting this error to the developers by creating a new issue on github.com (see "Help/Report an Issue..." in the menus).
             If you do, then open "Details", click "Copy to Clipboard", and paste the details into the issue.""";
         var errorInfo = new ErrorInfo("Program Error",

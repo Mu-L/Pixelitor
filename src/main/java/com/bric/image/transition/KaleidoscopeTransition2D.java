@@ -83,7 +83,7 @@ public class KaleidoscopeTransition2D extends Transition2D {
                 e.printStackTrace();
             }
         }
-        return v2.toArray(new Transition2DInstruction[v2.size()]);
+        return v2.toArray(new Transition2DInstruction[0]);
     }
 
     @Override

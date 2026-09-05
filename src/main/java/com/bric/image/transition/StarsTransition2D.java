@@ -215,7 +215,7 @@ public class StarsTransition2D extends AbstractClippedTransition2D {
             v.add(star8);
         }
 
-        Shape[] shapes = v.toArray(new Shape[v.size()]);
+        Shape[] shapes = v.toArray(new Shape[0]);
         if (type == LEFT) {
             AffineTransform flipHorizontal = TransformUtils.createAffineTransform(0, 0,
                     0, size.height,

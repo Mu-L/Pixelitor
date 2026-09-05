@@ -113,7 +113,7 @@ public class RandomToolTest {
         VK_G, VK_N, VK_I, VK_P, VK_U, VK_H, VK_Z,
     };
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         Utils.ensureAssertionsEnabled();
         FailOnThreadViolationRepaintManager.install();
 
@@ -676,7 +676,7 @@ public class RandomToolTest {
         log("randomizing the shape type setting for " + shapeType);
 
         app.withToolDialog("shapeSettingsButton",
-            "Settings for " + shapeType.toString(),
+            "Settings for " + shapeType,
             dialog -> randomizeShapeSettingsDialog(dialog, shapeType));
     }
 

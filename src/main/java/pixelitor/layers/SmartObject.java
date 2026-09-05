@@ -982,10 +982,7 @@ public class SmartObject extends CompositeLayer {
             // legacy field, should be null after migration
             throw new AssertionError();
         }
-        if (!content.checkInvariants()) {
-            return false;
-        }
-        return true;
+        return content.checkInvariants();
     }
 
     @Override

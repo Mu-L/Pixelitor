@@ -35,7 +35,7 @@ public class TestFilterPerformance {
     private TestFilterPerformance() {
     }
 
-    public static void main(String[] args) throws IOException {
+    static void main(String[] args) throws IOException {
         if (args.length == 0) {
             throw new IllegalStateException("missing argument");
         }

@@ -111,7 +111,7 @@ public class MeasuredShape implements Serializable {
         if (path != null) {
             v.add(new MeasuredShape(path, spacing));
         }
-        return v.toArray(new MeasuredShape[v.size()]);
+        return v.toArray(new MeasuredShape[0]);
     }
 
     static class Segment implements Serializable {
@@ -427,7 +427,7 @@ public class MeasuredShape implements Serializable {
             originalDistance = closedDistance;
         }
 
-        segments = v.toArray(new Segment[v.size()]);
+        segments = v.toArray(new Segment[0]);
         //normalize everything:
         for (Segment segment : segments) {
             segment.normalizedDistance = segment.realDistance / closedDistance;
